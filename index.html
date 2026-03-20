@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GOWTHAM AI MEDICAL ASSISTANT</title>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;;
+            margin: 0;
+            background: #f0f8ff;
+        }
+
+        header {
+            background: rgb(192, 0, 245);
+            color: rgb(255, 255, 255);
+            padding: 15px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            background: rgb(132, 0, 139);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            width: 250px;
+            margin: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .dark {
+            background: black;
+            color: white;
+        }
+
+        .dark .card {
+            background: #04000006;
+        }
+
+        #chatbox {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 260px;
+            background: rgb(255, 2, 175);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgb(255, 0, 247);
+        }
+
+        #messages {
+            height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        #loginPage {
+            text-align: center;
+            margin-top: 100px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+    <h2>🔐 Login</h2>
+    <input type="text" id="user" placeholder="Username"><br>
+    <input type="password" id="pass" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+</div>
+
+<!-- MAIN -->
+<div id="mainPage" style="display:none;">
+
+<header>
+    <h1>🩺 GOWTHAM AI MEDICAL ASSISTANT</h1>
+    <button onclick="darkMode()">🌙 Dark Mode</button>
+</header>
+
+<center>
+<input type="text" id="search" placeholder="Search disease..." onkeyup="searchDisease()">
+</center>
+
+<div class="container">
+<div class="card"><h3>Fever</h3><p>Tablet: Paracetamol</p></div>
+<div class="card"><h3>Cold</h3><p>Tablet: Cetirizine</p></div>
+<div class="card"><h3>Headache</h3><p>Tablet: Aspirin</p></div>
+<div class="card"><h3>Diabetes</h3><p>Tablet: Metformin</p></div>
+<div class="card"><h3>Asthma</h3><p>Tablet: Salbutamol</p></div>
+<div class="card"><h3>Allergy</h3><p>Tablet: Loratadine</p></div>
+<div class="card"><h3>BP</h3><p>Tablet: Amlodipine</p></div>
+<div class="card"><h3>Stomach Pain</h3><p>Tablet: Omeprazole</p></div>
+<div class="card"><h3>Infection</h3><p>Tablet: Amoxicillin</p></div>
+<div class="card"><h3>Vitamin Deficiency</h3><p>Tablet: Vitamins</p></div>
+</div>
+
+<center>
+<h2>BMI Calculator 📊</h2>
+<input type="number" id="h" placeholder="Height cm">
+<input type="number" id="w" placeholder="Weight kg">
+<button onclick="bmi()">Calculate</button>
+<p id="b"></p>
+</center>
+
+<!-- Voice -->
+<center>
+<button onclick="startVoice()">🎤 Speak</button>
+</center>
+
+<!-- Chatbot -->
+<div id="chatbox">
+    <div id="messages"></div>
+    <input id="chatInput" placeholder="Ask...">
+    <button onclick="send()">Send</button>
+</div>
+
+</div>
+
+<script>
+
+function login(){
+    let u=document.getElementById("user").value;
+    let p=document.getElementById("pass").value;
+
+    if(u=="admin" && p=="1234"){
+        document.getElementById("loginPage").style.display="none";
+        document.getElementById("mainPage").style.display="block";
+    } else {
+        alert("Wrong login!");
+    }
+}
+
+function darkMode(){
+    document.body.classList.toggle("dark");
+}
+
+function searchDisease(){
+    let input=document.getElementById("search").value.toLowerCase();
+    let cards=document.getElementsByClassName("card");
+
+    for(let i=0;i<cards.length;i++){
+        let t=cards[i].innerText.toLowerCase();
+        cards[i].style.display=t.includes(input)?"block":"none";
+    }
+}
+
+function bmi(){
+    let h=document.getElementById("h").value/100;
+    let w=document.getElementById("w").value;
+    let res=(w/(h*h)).toFixed(2);
+    document.getElementById("b").innerText="BMI: "+res;
+}
+
+function send(){
+    let input=document.getElementById("chatInput").value;
+    let msg=document.getElementById("messages");
+
+    msg.innerHTML += "<p><b>You:</b> "+input+"</p>";
+
+    let reply="I don't understand";
+
+    input=input.toLowerCase();
+
+    if(input.includes("fever")) reply="Take Paracetamol";
+    else if(input.includes("cold")) reply="Take Cetirizine";
+    else if(input.includes("headache")) reply="Take Aspirin";
+    else if(input.includes("diabetes")) reply="Take Metformin";
+    else if(input.includes("hi")) reply="Hello 👋";
+
+    msg.innerHTML += "<p><b>Bot:</b> "+reply+"</p>";
+
+    document.getElementById("chatInput").value="";
+}
+
+function startVoice(){
+    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.start();
+
+    recognition.onresult = function(event){
+        let text = event.results[0][0].transcript.toLowerCase();
+
+        let reply="I don't understand";
+
+        if(text.includes("fever")) reply="Take Paracetamol";
+        else if(text.includes("cold")) reply="Take Cetirizine";
+
+        speak(reply);
+    }
+}
+
+function speak(msg){
+    let speech=new SpeechSynthesisUtterance(msg);
+    speechSynthesis.speak(speech);
+}
+
+</script>
+
+</body>
+</html>
+<head><link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
